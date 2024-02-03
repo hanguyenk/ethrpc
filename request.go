@@ -81,7 +81,11 @@ func (r *Request) Execute(method RequestMethod) (*Response, error) {
 	return r.executor.Execute(r)
 }
 
-func (r *Request) TryAggregate() (*Response, error) {
+func (r *Request) Call() (*Response, error) {
+	return r.Execute(RequestMethodCall)
+}
+
+func (r *Request) Aggregate() (*Response, error) {
 	return r.Execute(RequestMethodAggregate)
 }
 
