@@ -64,4 +64,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag_name: ${{ env.VERSION_TAG }}
           prerelease: false
-          name: "ETH Adapter ${{ env.VERSION_TAG }}"
+          name: "ETHRPC ${{ env.VERSION_TAG }}"
