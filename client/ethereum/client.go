@@ -13,13 +13,11 @@ import (
 )
 
 type Client struct {
-	config *Config
-
 	client *ethclient.Client
 }
 
-func NewClient(config *Config) (*Client, error) {
-	client, err := ethclient.Dial(config.URL)
+func NewClient(url string) (*Client, error) {
+	client, err := ethclient.Dial(url)
 	if err != nil {
 		return nil, err
 	}
