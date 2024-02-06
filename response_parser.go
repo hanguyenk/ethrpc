@@ -99,7 +99,7 @@ func ResponseParserTryBlockAndAggregate(executor RequestExecutor, resp *Response
 			continue
 		}
 
-		if unpackSucceed := tryUnpack(c.UnpackABI, c.Output[i], c.Method, result.ReturnData[i].ReturnData); !unpackSucceed {
+		if unpackSucceed := tryUnpack(c.UnpackABI, c.Output, c.Method, result.ReturnData[i].ReturnData); !unpackSucceed {
 			return ErrUnpackMulticallFailed
 		}
 	}
@@ -110,9 +110,9 @@ func ResponseParserTryBlockAndAggregate(executor RequestExecutor, resp *Response
 }
 
 // tryUnpack receives a list of ABIs, try to unpack and returns true if it can unpack successfully
-func tryUnpack(unpackABIs []abi.ABI, output any, method string, data []byte) bool {
-	for _, unpackABI := range unpackABIs {
-		if err := unpackABI.UnpackIntoInterface(output, method, data); err != nil {
+func tryUnpack(unpackABIs []abi.ABI, output []any, method string, data []byte) bool {
+	for i, unpackABI := range unpackABIs {
+		if err := unpackABI.UnpackIntoInterface(output[i], method, data); err != nil {
 			continue
 		}
 

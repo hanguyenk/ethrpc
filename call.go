@@ -9,11 +9,11 @@ type Call struct {
 	UnpackABI []abi.ABI
 	Target    string
 	Method    string
-	Params    []interface{}
-	Output    []interface{}
+	Params    []any
+	Output    []any
 }
 
-func (c *Call) SetOutput(output []interface{}) *Call {
+func (c *Call) SetOutput(output []any) *Call {
 	c.Output = output
 
 	return c
