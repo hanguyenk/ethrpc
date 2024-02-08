@@ -5,6 +5,8 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
+
+	"github.com/hanguyenk/ethrpc/adapter/types"
 )
 
 type Request struct {
@@ -14,7 +16,7 @@ type Request struct {
 	RequireSuccess bool
 	Calls          []*Call
 	ctx            context.Context
-	RawCallMsg     CallMsg
+	RawCallMsg     types.CallMsg
 
 	BlockNumber *big.Int
 	BlockHash   common.Hash

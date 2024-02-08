@@ -3,6 +3,8 @@ package ethrpc
 import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/pkg/errors"
+
+	"github.com/hanguyenk/ethrpc/adapter/types"
 )
 
 var (
@@ -49,7 +51,7 @@ func RequestParserCall(_ RequestExecutor, req *Request) error {
 
 	target := common.HexToAddress(call.Target)
 
-	req.RawCallMsg = CallMsg{
+	req.RawCallMsg = types.CallMsg{
 		To:   &target,
 		Data: data,
 	}
@@ -87,7 +89,7 @@ func RequestParserAggregate(executor RequestExecutor, req *Request) error {
 		return err
 	}
 
-	msg := CallMsg{To: &multicallContractAddress, Data: data}
+	msg := types.CallMsg{To: &multicallContractAddress, Data: data}
 	req.RawCallMsg = msg
 
 	return nil
@@ -121,7 +123,7 @@ func RequestParserTryBlockAndAggregate(executor RequestExecutor, req *Request) e
 		return err
 	}
 
-	msg := CallMsg{To: &multicallContractAddress, Data: data}
+	msg := types.CallMsg{To: &multicallContractAddress, Data: data}
 	req.RawCallMsg = msg
 
 	return nil

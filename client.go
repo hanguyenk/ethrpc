@@ -3,12 +3,14 @@ package ethrpc
 import (
 	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/common"
+
+	"github.com/hanguyenk/ethrpc/adapter"
 )
 
 var zeroHash = common.Hash{}
 
 type Client struct {
-	adapter EthClientAdapter
+	adapter adapter.EthClientAdapter
 
 	options ClientOptions
 
@@ -31,7 +33,7 @@ func NewClient(options ...func(*Client)) *Client {
 	return client
 }
 
-func WithEthClientAdapter(adapter EthClientAdapter) func(*Client) {
+func WithEthClientAdapter(adapter adapter.EthClientAdapter) func(*Client) {
 	return func(client *Client) {
 		client.adapter = adapter
 	}

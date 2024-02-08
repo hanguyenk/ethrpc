@@ -1,19 +1,19 @@
-package ethereum
+package avalanche
 
 import (
 	"context"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum"
+	"github.com/ava-labs/coreth/core/types"
+	"github.com/ava-labs/coreth/ethclient"
+	"github.com/ava-labs/coreth/interfaces"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ethereum/go-ethereum/ethclient"
 
 	adaptertypes "github.com/hanguyenk/ethrpc/adapter/types"
 )
 
 type Adapter struct {
-	client *ethclient.Client
+	client ethclient.Client
 }
 
 func NewAdapter(url string) (*Adapter, error) {
@@ -28,19 +28,19 @@ func NewAdapter(url string) (*Adapter, error) {
 }
 
 func (a *Adapter) CallContract(ctx context.Context, msg adaptertypes.CallMsg, blockNumber *big.Int) ([]byte, error) {
-	ethereumCallMsg := a.convertToEthereumCallMsg(msg)
+	avalancheCallMsg := a.convertToAvalancheCallMsg(msg)
 
-	return a.client.CallContract(ctx, ethereumCallMsg, blockNumber)
+	return a.client.CallContract(ctx, avalancheCallMsg, blockNumber)
 }
 
 func (a *Adapter) CallContractAtHash(ctx context.Context, msg adaptertypes.CallMsg, blockHash common.Hash) ([]byte, error) {
-	ethereumCallMsg := a.convertToEthereumCallMsg(msg)
+	avalancheCallMsg := a.convertToAvalancheCallMsg(msg)
 
-	return a.client.CallContractAtHash(ctx, ethereumCallMsg, blockHash)
+	return a.client.CallContractAtHash(ctx, avalancheCallMsg, blockHash)
 }
 
-func (a *Adapter) convertToEthereumCallMsg(originMsg adaptertypes.CallMsg) ethereum.CallMsg {
-	return ethereum.CallMsg{
+func (a *Adapter) convertToAvalancheCallMsg(originMsg adaptertypes.CallMsg) interfaces.CallMsg {
+	return interfaces.CallMsg{
 		From:       originMsg.From,
 		To:         originMsg.To,
 		Gas:        originMsg.Gas,
@@ -49,11 +49,11 @@ func (a *Adapter) convertToEthereumCallMsg(originMsg adaptertypes.CallMsg) ether
 		GasTipCap:  originMsg.GasTipCap,
 		Value:      originMsg.Value,
 		Data:       originMsg.Data,
-		AccessList: a.convertToEthereumAccessList(originMsg.AccessList),
+		AccessList: a.convertToAvalancheAccessList(originMsg.AccessList),
 	}
 }
 
-func (a *Adapter) convertToEthereumAccessList(originAccessList adaptertypes.AccessList) types.AccessList {
+func (a *Adapter) convertToAvalancheAccessList(originAccessList adaptertypes.AccessList) types.AccessList {
 	accessList := make([]types.AccessTuple, 0, len(originAccessList))
 
 	for _, originAccessTuple := range originAccessList {
