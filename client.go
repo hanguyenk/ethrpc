@@ -7,62 +7,62 @@ import (
 
 var zeroHash = common.Hash{}
 
-type Adapter struct {
-	client ETHClient
+type Client struct {
+	adapter EthClientAdapter
 
-	options AdapterOptions
+	options ClientOptions
 
 	requestMiddlewares  []RequestMiddleware
 	responseMiddlewares []ResponseMiddleware
 }
 
-type AdapterOptions struct {
+type ClientOptions struct {
 	MultiCallContractAddress common.Address
 	MultiCallABI             abi.ABI
 }
 
-func NewAdapter(options ...func(*Adapter)) *Adapter {
-	adapter := &Adapter{}
+func NewClient(options ...func(*Client)) *Client {
+	client := &Client{}
 
 	for _, o := range options {
-		o(adapter)
+		o(client)
 	}
 
-	return adapter
+	return client
 }
 
-func WithClient(client ETHClient) func(*Adapter) {
-	return func(adapter *Adapter) {
-		adapter.client = client
+func WithEthClientAdapter(adapter EthClientAdapter) func(*Client) {
+	return func(client *Client) {
+		client.adapter = adapter
 	}
 }
 
-func WithMulticall(multiCallContractAddress common.Address, multiCallABI abi.ABI) func(*Adapter) {
-	return func(adapter *Adapter) {
+func WithMulticall(multiCallContractAddress common.Address, multiCallABI abi.ABI) func(*Client) {
+	return func(adapter *Client) {
 		adapter.options.MultiCallContractAddress = multiCallContractAddress
 		adapter.options.MultiCallABI = multiCallABI
 	}
 }
 
-func WithRequestMiddlewares(middlewares ...RequestMiddleware) func(*Adapter) {
-	return func(adapter *Adapter) {
+func WithRequestMiddlewares(middlewares ...RequestMiddleware) func(*Client) {
+	return func(adapter *Client) {
 		adapter.requestMiddlewares = middlewares
 	}
 }
 
-func WithResponseMiddlewares(middlewares ...ResponseMiddleware) func(*Adapter) {
-	return func(adapter *Adapter) {
+func WithResponseMiddlewares(middlewares ...ResponseMiddleware) func(*Client) {
+	return func(adapter *Client) {
 		adapter.responseMiddlewares = middlewares
 	}
 }
 
-func (a *Adapter) NewRequest() *Request {
+func (a *Client) NewRequest() *Request {
 	return &Request{
 		executor: a,
 	}
 }
 
-func (a *Adapter) Execute(req *Request) (*Response, error) {
+func (a *Client) Execute(req *Request) (*Response, error) {
 	for _, f := range a.requestMiddlewares {
 		if err := f(a, req); err != nil {
 			return nil, err
@@ -88,18 +88,18 @@ func (a *Adapter) Execute(req *Request) (*Response, error) {
 	return resp, err
 }
 
-func (a *Adapter) GetMulticallContractAddress() common.Address {
+func (a *Client) GetMulticallContractAddress() common.Address {
 	return a.options.MultiCallContractAddress
 }
 
-func (a *Adapter) GetMulticallABI() abi.ABI {
+func (a *Client) GetMulticallABI() abi.ABI {
 	return a.options.MultiCallABI
 }
 
-func (a *Adapter) callContract(req *Request) ([]byte, error) {
+func (a *Client) callContract(req *Request) ([]byte, error) {
 	if req.BlockHash != zeroHash {
-		return a.client.CallContractAtHash(req.Context(), req.RawCallMsg, req.BlockHash)
+		return a.adapter.CallContractAtHash(req.Context(), req.RawCallMsg, req.BlockHash)
 	}
 
-	return a.client.CallContract(req.Context(), req.RawCallMsg, req.BlockNumber)
+	return a.adapter.CallContract(req.Context(), req.RawCallMsg, req.BlockNumber)
 }

@@ -14,7 +14,8 @@ type RequestExecutor interface {
 	GetMulticallABI() abi.ABI
 }
 
-type ETHClient interface {
+// EthClientAdapter ...
+type EthClientAdapter interface {
 	CallContract(ctx context.Context, msg CallMsg, blockNumber *big.Int) ([]byte, error)
 	CallContractAtHash(ctx context.Context, msg CallMsg, blockHash common.Hash) ([]byte, error)
 }

@@ -10,8 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/suite"
 
+	"github.com/hanguyenk/ethrpc/adapter/ethereum"
+
 	"github.com/hanguyenk/ethrpc"
-	"github.com/hanguyenk/ethrpc/client/ethereum"
 )
 
 var (
@@ -29,18 +30,16 @@ func TestAdapterTestSuite(t *testing.T) {
 type AdapterTestSuite struct {
 	suite.Suite
 
-	adapter *ethrpc.Adapter
+	client *ethrpc.Client
 }
 
 func (ts *AdapterTestSuite) SetupTest() {
-	config := &ethereum.Config{URL: "https://eth.llamarpc.com"}
-
-	client, err := ethereum.NewClient(config)
+	adapter, err := ethereum.NewAdapter("https://eth.llamarpc.com")
 
 	assert.Nil(ts.T(), err)
 
-	ts.adapter = ethrpc.NewAdapter(
-		ethrpc.WithClient(client),
+	ts.client = ethrpc.NewClient(
+		ethrpc.WithEthClientAdapter(adapter),
 		ethrpc.WithMulticall(multicallContractAddress, multicallABI),
 		ethrpc.WithRequestMiddlewares(ethrpc.ParseRequestMiddleware),
 		ethrpc.WithResponseMiddlewares(ethrpc.ParseResponseMiddleware),
@@ -62,7 +61,7 @@ func (ts *AdapterTestSuite) TestTryAggregate() {
 
 	getReservesResultList := make([]GetReservesResult, len(poolAddresses))
 
-	req := ts.adapter.NewRequest()
+	req := ts.client.NewRequest()
 
 	for i, poolAddress := range poolAddresses {
 		req.AddCall(
@@ -76,7 +75,7 @@ func (ts *AdapterTestSuite) TestTryAggregate() {
 		)
 	}
 
-	resp, err := req.TryAggregate()
+	resp, err := req.TryBlockAndAggregate()
 
 	ts.Require().NoError(err)
 	ts.Require().Len(resp.Result, len(req.Calls))

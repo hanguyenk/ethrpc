@@ -12,34 +12,34 @@ import (
 	"github.com/hanguyenk/ethrpc"
 )
 
-type Client struct {
+type Adapter struct {
 	client *ethclient.Client
 }
 
-func NewClient(url string) (*Client, error) {
+func NewAdapter(url string) (*Adapter, error) {
 	client, err := ethclient.Dial(url)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Client{
+	return &Adapter{
 		client: client,
 	}, nil
 }
 
-func (c *Client) CallContract(ctx context.Context, msg ethrpc.CallMsg, blockNumber *big.Int) ([]byte, error) {
-	ethereumCallMsg := c.convertToEthereumCallMsg(msg)
+func (a *Adapter) CallContract(ctx context.Context, msg ethrpc.CallMsg, blockNumber *big.Int) ([]byte, error) {
+	ethereumCallMsg := a.convertToEthereumCallMsg(msg)
 
-	return c.client.CallContract(ctx, ethereumCallMsg, blockNumber)
+	return a.client.CallContract(ctx, ethereumCallMsg, blockNumber)
 }
 
-func (c *Client) CallContractAtHash(ctx context.Context, msg ethrpc.CallMsg, blockHash common.Hash) ([]byte, error) {
-	ethereumCallMsg := c.convertToEthereumCallMsg(msg)
+func (a *Adapter) CallContractAtHash(ctx context.Context, msg ethrpc.CallMsg, blockHash common.Hash) ([]byte, error) {
+	ethereumCallMsg := a.convertToEthereumCallMsg(msg)
 
-	return c.client.CallContractAtHash(ctx, ethereumCallMsg, blockHash)
+	return a.client.CallContractAtHash(ctx, ethereumCallMsg, blockHash)
 }
 
-func (c *Client) convertToEthereumCallMsg(originMsg ethrpc.CallMsg) ethereum.CallMsg {
+func (a *Adapter) convertToEthereumCallMsg(originMsg ethrpc.CallMsg) ethereum.CallMsg {
 	return ethereum.CallMsg{
 		From:       originMsg.From,
 		To:         originMsg.To,
@@ -49,11 +49,11 @@ func (c *Client) convertToEthereumCallMsg(originMsg ethrpc.CallMsg) ethereum.Cal
 		GasTipCap:  originMsg.GasTipCap,
 		Value:      originMsg.Value,
 		Data:       originMsg.Data,
-		AccessList: c.convertToEthereumAccessList(originMsg.AccessList),
+		AccessList: a.convertToEthereumAccessList(originMsg.AccessList),
 	}
 }
 
-func (c *Client) convertToEthereumAccessList(originAccessList ethrpc.AccessList) types.AccessList {
+func (a *Adapter) convertToEthereumAccessList(originAccessList ethrpc.AccessList) types.AccessList {
 	accessList := make([]types.AccessTuple, 0, len(originAccessList))
 
 	for _, originAccessTuple := range originAccessList {
